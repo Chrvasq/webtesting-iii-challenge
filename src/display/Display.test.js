@@ -4,37 +4,33 @@ import "@testing-library/jest-dom/extend-expect";
 import Display from "./Display";
 import Dashboard from "../dashboard/Dashboard";
 
-describe("<Display/>", () => {
+describe("Gate", () => {
   it("should match snapshot", () => {
     const wrapper = rtl.render(<Display />);
     expect(wrapper).toMatchSnapshot();
   });
 
   it('should default to "Unlocked" and "Open', () => {
-    const wrapper = rtl.render(<Display />);
-    const element1 = wrapper.getByText(/unlocked/i);
-    const element2 = wrapper.getByText(/open/i);
+    const { getByText } = rtl.render(<Display />);
 
-    expect(element1).toBeInTheDocument();
-    expect(element2).toBeInTheDocument();
+    expect(getByText(/unlocked/i)).toBeTruthy();
+    expect(getByText(/open/i)).toBeTruthy();
   });
 
   it('cannot be "Closed" or "Opened" if it is "Locked"', () => {
-    const wrapper = rtl.render(<Dashboard />);
-    const element1 = wrapper.getByText(/lock gate/i);
-    const element2 = wrapper.getByText(/close gate/i);
+    const { getByText } = rtl.render(<Dashboard />);
 
     //sanity check default is disabled
-    expect(element1).toBeDisabled();
+    expect(getByText(/lock gate/i)).toBeDisabled();
 
     rtl.act(() => {
-      rtl.fireEvent.click(element2);
+      rtl.fireEvent.click(getByText(/close gate/i));
     });
 
     rtl.act(() => {
-      rtl.fireEvent.click(element1);
+      rtl.fireEvent.click(getByText(/lock gate/i));
     });
 
-    expect(element2).toBeDisabled();
+    expect(getByText(/open gate/i)).toBeDisabled();
   });
 });
