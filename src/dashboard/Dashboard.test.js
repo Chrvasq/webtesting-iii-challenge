@@ -1,11 +1,13 @@
 import React from "react";
-import * as rtl from "@testing-library/react";
+import { render, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import Dashboard from "../dashboard/Dashboard";
 
+afterEach(cleanup);
+
 describe("<Dashboard/>", () => {
   it("renders control and display", () => {
-    const { getByText } = rtl.render(<Dashboard />);
+    const { getByText } = render(<Dashboard />);
 
     expect(getByText(/open/i)).toBeTruthy();
     expect(getByText(/unlocked/i)).toBeTruthy();
