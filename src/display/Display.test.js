@@ -5,16 +5,11 @@ import Display from "./Display";
 import Dashboard from "../dashboard/Dashboard";
 
 describe("Gate", () => {
-  it("should match snapshot", () => {
-    const wrapper = rtl.render(<Display />);
-    expect(wrapper).toMatchSnapshot();
-  });
-
   it('should default to "Unlocked" and "Open', () => {
     const { getByText } = rtl.render(<Display />);
 
-    expect(getByText(/unlocked/i)).toBeTruthy();
-    expect(getByText(/open/i)).toBeTruthy();
+    expect(getByText(/unlocked/i).textContent).toBe("Unlocked");
+    expect(getByText(/open/i).textContent).toBe("Open");
   });
 
   it('cannot be "Closed" or "Opened" if it is "Locked"', () => {
@@ -32,5 +27,61 @@ describe("Gate", () => {
     });
 
     expect(getByText(/open gate/i)).toBeDisabled();
+  });
+});
+
+describe("<Display/>", () => {
+  it("displays if gate is open/closed and if it is locked/unlocked", () => {
+    const { getByText } = rtl.render(<Dashboard />);
+
+    rtl.act(() => {
+      rtl.fireEvent.click(getByText(/close gate/i));
+    });
+    expect(getByText(/closed/i).textContent).toBe("Closed");
+
+    rtl.act(() => {
+      rtl.fireEvent.click(getByText(/lock gate/i));
+    });
+    expect(getByText(/locked/i).textContent).toBe("Locked");
+
+    rtl.act(() => {
+      rtl.fireEvent.click(getByText(/unlock gate/i));
+    });
+    expect(getByText(/unlocked/i).textContent).toBe("Unlocked");
+
+    rtl.act(() => {
+      rtl.fireEvent.click(getByText(/open gate/i));
+    });
+    expect(getByText(/open/i).textContent).toBe("Open");
+  });
+
+  it("displays 'Closed' if the `closed` prop is `true` and 'Open' if otherwise", () => {
+    const { getByText, rerender } = rtl.render(<Display closed={true} />);
+    expect(getByText(/closed/i).textContent).toBe("Closed");
+
+    rerender(<Display closed={false} />);
+    expect(getByText(/open/i).textContent).toBe("Open");
+  });
+
+  it("displays 'Locked' if the `locked` prop is `true` and 'Unlocked' if otherwise", () => {
+    const { getByText, rerender } = rtl.render(<Display locked={true} />);
+    expect(getByText(/locked/i).textContent).toBe("Locked");
+
+    rerender(<Display locked={false} />);
+    expect(getByText(/unlocked/i).textContent).toBe("Unlocked");
+  });
+
+  it("when `locked` or `closed` use the `red-led` class", () => {
+    const { getByText, rerender } = rtl.render(
+      <Display locked={true} closed={true} />
+    );
+    expect(getByText(/locked/i).className).toBe("led red-led");
+    expect(getByText(/closed/i).className).toBe("led red-led");
+  });
+
+  it("when `unlocked` or `open` use the `green-led` class", () => {
+    const { getByText } = rtl.render(<Display locked={false} closed={false} />);
+    expect(getByText(/unlocked/i).className).toBe("led green-led");
+    expect(getByText(/open/i).className).toBe("led green-led");
   });
 });
